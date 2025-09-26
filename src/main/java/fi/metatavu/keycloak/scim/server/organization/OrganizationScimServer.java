@@ -3,6 +3,7 @@ package fi.metatavu.keycloak.scim.server.organization;
 import fi.metatavu.keycloak.scim.server.AbstractScimServer;
 import fi.metatavu.keycloak.scim.server.config.ConfigurationError;
 import fi.metatavu.keycloak.scim.server.filter.ScimFilter;
+import fi.metatavu.keycloak.scim.server.groups.UnsupportedGroupPath;
 import fi.metatavu.keycloak.scim.server.jacoco.ExcludeFromJacocoGeneratedReport;
 import fi.metatavu.keycloak.scim.server.metadata.UserAttributes;
 import fi.metatavu.keycloak.scim.server.model.Group;
@@ -217,22 +218,62 @@ public class OrganizationScimServer extends AbstractScimServer<OrganizationScimC
     @Override
     @ExcludeFromJacocoGeneratedReport
     public Response updateGroup(OrganizationScimContext scimContext, String id, Group updateRequest) {
-        // TODO: Organization Groups are not supported yet by the Keycloak
-        return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+        KeycloakSession session = scimContext.getSession();
+
+        GroupModel existing = session.groups().getGroupById(scimContext.getRealm(), id);
+        if (existing == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+
+        if (!id.equals(existing.getId())) {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Group ID mismatch").build();
+        }
+
+        fi.metatavu.keycloak.scim.server.model.Group updated = groupsController.updateGroup(
+            scimContext,
+            existing,
+            updateRequest
+        );
+
+        return Response.ok(updated).build();
     }
 
     @Override
     @ExcludeFromJacocoGeneratedReport
     public Response patchGroup(OrganizationScimContext scimContext, String groupId, PatchRequest patchRequest) {
-        // TODO: Organization Groups are not supported yet by the Keycloak
-        return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+        KeycloakSession session = scimContext.getSession();
+
+        GroupModel existing = session.groups().getGroupById(scimContext.getRealm(), groupId);
+        if (existing == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+
+        if (!groupId.equals(existing.getId())) {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Group ID mismatch").build();
+        }
+
+        try {
+            fi.metatavu.keycloak.scim.server.model.Group updated = groupsController.patchGroup(scimContext, existing, patchRequest);
+            return Response.ok(updated).build();
+        } catch (UnsupportedGroupPath e) {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Unsupported group path").build();
+        } catch (UnsupportedPatchOperation e) {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Unsupported patch operation").build();
+        }
     }
 
     @Override
     @ExcludeFromJacocoGeneratedReport
     public Response deleteGroup(OrganizationScimContext scimContext, String id) {
-        // TODO: Organization Groups are not supported yet by the Keycloak
-        return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+        KeycloakSession session = scimContext.getSession();
+        GroupModel group = session.groups().getGroupById(scimContext.getRealm(), id);
+        if (group == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+
+        groupsController.deleteGroup(scimContext, group);
+
+        return Response.noContent().build();
     }
 
     /**
