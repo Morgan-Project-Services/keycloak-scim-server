@@ -9,7 +9,9 @@ import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class OrganizationGroupsController extends GroupsController {
 
@@ -43,6 +45,30 @@ public class OrganizationGroupsController extends GroupsController {
     }
 
     public GroupsList listOrganizationGroups(OrganizationScimContext scimContext, int startIndex, int count) {
-        return listGroups(scimContext, startIndex, count);
+
+        KeycloakSession session = scimContext.getSession();
+        RealmModel realm = scimContext.getRealm();
+
+        GroupModel parentGroup = session.groups().getGroupsStream(realm)
+            .filter(g -> g.getFirstAttribute("organization").equals(scimContext.getOrganization().getAlias()))
+            .findFirst()
+            .orElse(null);
+
+        List<GroupModel> allGroups = parentGroup != null ? parentGroup.getSubGroupsStream().toList() : List.of();
+
+        List<Group> groups = allGroups.stream()
+            .skip(startIndex)
+            .limit(count)
+            .map(group -> translateGroup(scimContext, group))
+            .collect(Collectors.toList());
+
+        GroupsList result = new GroupsList();
+        result.setTotalResults(allGroups.size());
+        result.setStartIndex(startIndex);
+        result.setItemsPerPage(count);
+        result.setResources(groups);
+        result.setSchemas(Collections.singletonList("urn:ietf:params:scim:api:messages:2.0:ListResponse"));
+
+        return result;
     }
 }
