@@ -189,7 +189,7 @@ public class OrganizationScimServer extends AbstractScimServer<OrganizationScimC
     @Override
     @ExcludeFromJacocoGeneratedReport
     public Response createGroup(OrganizationScimContext scimContext, Group createRequest) {
-        fi.metatavu.keycloak.scim.server.model.Group created = organizationGroupsController.createGroup(scimContext, createRequest);
+        fi.metatavu.keycloak.scim.server.model.Group created = organizationGroupsController.createOrganizationGroup(scimContext, createRequest);
         URI location = UriBuilder.fromPath("v2/organizations/{organizationId}/Groups/{id}").build(scimContext.getOrganization().getId(), created.getId());
         return Response
             .created(location)
@@ -200,7 +200,7 @@ public class OrganizationScimServer extends AbstractScimServer<OrganizationScimC
     @Override
     @ExcludeFromJacocoGeneratedReport
     public Response listGroups(OrganizationScimContext scimContext, int startIndex, int count) {
-        fi.metatavu.keycloak.scim.server.model.GroupsList groupList = groupsController.listGroups(scimContext, startIndex, count);
+        fi.metatavu.keycloak.scim.server.model.GroupsList groupList = organizationGroupsController.listOrganizationGroups(scimContext, startIndex, count);
         return Response.ok(groupList).build();
     }
 
