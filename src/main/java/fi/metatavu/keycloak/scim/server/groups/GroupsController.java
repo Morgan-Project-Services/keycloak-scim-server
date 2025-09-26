@@ -241,7 +241,7 @@ public class GroupsController extends AbstractController {
      * @param group group
      * @return SCIM group
      */
-    private Group translateGroup(
+    protected Group translateGroup(
             ScimContext scimContext,
             GroupModel group
     ) {

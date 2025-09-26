@@ -12,6 +12,7 @@ import fi.metatavu.keycloak.scim.server.patch.UnsupportedPatchOperation;
 import jakarta.ws.rs.InternalServerErrorException;
 import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.UriBuilder;
 import org.jboss.logging.Logger;
 import org.keycloak.models.*;
 
@@ -26,10 +27,12 @@ public class OrganizationScimServer extends AbstractScimServer<OrganizationScimC
     private static final Logger logger = Logger.getLogger(OrganizationScimServer.class);
     private final OrganizationController organizationController;
     private final OrganizationUserController organizationUserController;
+    private final OrganizationGroupsController organizationGroupsController;
 
     public OrganizationScimServer() {
         this.organizationController = new OrganizationController();
         this.organizationUserController = new OrganizationUserController();
+        this.organizationGroupsController = new OrganizationGroupsController();
     }
 
     @Override
@@ -186,22 +189,29 @@ public class OrganizationScimServer extends AbstractScimServer<OrganizationScimC
     @Override
     @ExcludeFromJacocoGeneratedReport
     public Response createGroup(OrganizationScimContext scimContext, Group createRequest) {
-        // TODO: Organization Groups are not supported yet by the Keycloak
-        return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+        fi.metatavu.keycloak.scim.server.model.Group created = organizationGroupsController.createGroup(scimContext, createRequest);
+        URI location = UriBuilder.fromPath("v2/organizations/{organizationId}/Groups/{id}").build(scimContext.getOrganization().getId(), created.getId());
+        return Response
+            .created(location)
+            .entity(created)
+            .build();
     }
 
     @Override
     @ExcludeFromJacocoGeneratedReport
     public Response listGroups(OrganizationScimContext scimContext, int startIndex, int count) {
-        // TODO: Organization Groups are not supported yet by the Keycloak
-        return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+        fi.metatavu.keycloak.scim.server.model.GroupsList groupList = groupsController.listGroups(scimContext, startIndex, count);
+        return Response.ok(groupList).build();
     }
 
     @Override
     @ExcludeFromJacocoGeneratedReport
     public Response findGroup(OrganizationScimContext scimContext, String id) {
-        // TODO: Organization Groups are not supported yet by the Keycloak
-        return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+        fi.metatavu.keycloak.scim.server.model.Group group = groupsController.findGroup(scimContext, id);
+        if (group == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        return Response.ok(group).build();
     }
 
     @Override
