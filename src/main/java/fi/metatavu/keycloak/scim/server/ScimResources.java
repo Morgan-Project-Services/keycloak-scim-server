@@ -469,7 +469,8 @@ public class ScimResources {
     public Response createOrganizationGroup(
         @Context KeycloakSession session,
         @PathParam("organizationId") String organizationId,
-        fi.metatavu.keycloak.scim.server.model.Group createRequest
+        fi.metatavu.keycloak.scim.server.model.Group createRequest,
+        @Context UriInfo uriInfo
     ) {
         OrganizationScimContext scimContext = organizationScimServer.getScimContext(session, organizationId);
         organizationScimServer.verifyPermissions(scimContext);
@@ -488,7 +489,8 @@ public class ScimResources {
             @Context KeycloakSession session,
             @PathParam("organizationId") String organizationId,
             @QueryParam("startIndex") @DefaultValue("0") int startIndex,
-            @QueryParam("count") @DefaultValue("100") int count
+            @QueryParam("count") @DefaultValue("100") int count,
+            @Context UriInfo uriInfo
     ) {
         OrganizationScimContext scimContext = organizationScimServer.getScimContext(session, organizationId);
         organizationScimServer.verifyPermissions(scimContext);
@@ -507,7 +509,8 @@ public class ScimResources {
     public Response findOrganizationGroup(
             @Context KeycloakSession session,
             @PathParam("organizationId") String organizationId,
-            @PathParam("id") String id
+            @PathParam("id") String id,
+            @Context UriInfo uriInfo
     ) {
         OrganizationScimContext scimContext = organizationScimServer.getScimContext(session, organizationId);
         organizationScimServer.verifyPermissions(scimContext);
@@ -527,7 +530,8 @@ public class ScimResources {
             @Context KeycloakSession session,
             @PathParam("id") String id,
             @PathParam("organizationId") String organizationId,
-            Group updateRequest
+            Group updateRequest,
+            @Context UriInfo uriInfo
     ) {
         OrganizationScimContext scimContext = organizationScimServer.getScimContext(session, organizationId);
         organizationScimServer.verifyPermissions(scimContext);
@@ -548,7 +552,8 @@ public class ScimResources {
             @Context KeycloakSession session,
             @PathParam("id") String groupId,
             @PathParam("organizationId") String organizationId,
-            fi.metatavu.keycloak.scim.server.model.PatchRequest patchRequest
+            fi.metatavu.keycloak.scim.server.model.PatchRequest patchRequest,
+            @Context UriInfo uriInfo
     ) {
         OrganizationScimContext scimContext = organizationScimServer.getScimContext(session, organizationId);
         organizationScimServer.verifyPermissions(scimContext);
@@ -566,7 +571,8 @@ public class ScimResources {
     public Response deleteOrganizationGroup(
             @Context KeycloakSession session,
             @PathParam("organizationId") String organizationId,
-            @PathParam("id") String id
+            @PathParam("id") String id,
+            @Context UriInfo uriInfo
     ) {
         OrganizationScimContext scimContext = organizationScimServer.getScimContext(session, organizationId);
         organizationScimServer.verifyPermissions(scimContext);
