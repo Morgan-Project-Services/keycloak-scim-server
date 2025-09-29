@@ -174,13 +174,23 @@ public class ScimResources {
     public Response listRealmGroups(
             @Context KeycloakSession session,
             @QueryParam("startIndex") @DefaultValue("0") int startIndex,
-            @QueryParam("count") @DefaultValue("100") int count
+            @QueryParam("count") @DefaultValue("100") int count,
+            @QueryParam("filter") String filter
     ) {
+        ScimFilter scimFilter;
+        try {
+            scimFilter = parseFilter(filter);
+        } catch (Exception e) {
+            logger.warn(String.format("Failed to parse filter: '%s'", filter), e);
+            return Response.status(Response.Status.BAD_REQUEST).entity("Invalid filter").build();
+        }
+
         RealmScimContext scimContext = realmScimServer.getScimContext(session);
         realmScimServer.verifyPermissions(scimContext);
 
         return realmScimServer.listGroups(
                 scimContext,
+                scimFilter,
                 startIndex,
                 count
         );
