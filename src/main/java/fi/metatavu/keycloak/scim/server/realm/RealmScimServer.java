@@ -192,7 +192,7 @@ public class RealmScimServer extends AbstractScimServer<RealmScimContext> {
     }
 
     @Override
-    public Response listGroups(RealmScimContext scimContext, int startIndex, int count) {
+    public Response listGroups(RealmScimContext scimContext, ScimFilter scimFilter, int startIndex, int count) {
         fi.metatavu.keycloak.scim.server.model.GroupsList groupList = groupsController.listGroups(scimContext, startIndex, count);
         return Response.ok(groupList).build();
     }
