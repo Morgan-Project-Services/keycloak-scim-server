@@ -1,16 +1,23 @@
 package fi.metatavu.keycloak.scim.server.organization;
 
 import fi.metatavu.keycloak.scim.server.ScimContext;
+import fi.metatavu.keycloak.scim.server.filter.ComparisonFilter;
+import fi.metatavu.keycloak.scim.server.filter.ScimFilter;
 import fi.metatavu.keycloak.scim.server.groups.GroupsController;
+import fi.metatavu.keycloak.scim.server.metadata.GroupAttribute;
+import fi.metatavu.keycloak.scim.server.metadata.UserAttribute;
 import fi.metatavu.keycloak.scim.server.model.Group;
 import fi.metatavu.keycloak.scim.server.model.GroupsList;
+import fi.metatavu.keycloak.scim.server.users.UnsupportedUserPath;
 import org.keycloak.models.GroupModel;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class OrganizationGroupsController extends GroupsController {
@@ -44,7 +51,7 @@ public class OrganizationGroupsController extends GroupsController {
         return translateGroup(scimContext, group);
     }
 
-    public GroupsList listOrganizationGroups(OrganizationScimContext scimContext, int startIndex, int count) {
+    public GroupsList listOrganizationGroups(OrganizationScimContext scimContext, ScimFilter scimFilter, int startIndex, int count) {
 
         KeycloakSession session = scimContext.getSession();
         RealmModel realm = scimContext.getRealm();
@@ -57,6 +64,14 @@ public class OrganizationGroupsController extends GroupsController {
         List<GroupModel> allGroups = parentGroup != null ? parentGroup.getSubGroupsStream().toList() : List.of();
 
         List<Group> groups = allGroups.stream()
+            .filter(group -> {
+                if (scimFilter instanceof ComparisonFilter cmp) {
+                    if (cmp.operator() == ScimFilter.Operator.EQ && GroupAttribute.DISPLAY_NAME.getScimPath().equals(cmp.attribute())) {
+                        return group.getName() != null && cmp.value() != null && group.getName().equals(cmp.value());
+                    }
+                }
+                return false;
+            })
             .skip(startIndex)
             .limit(count)
             .map(group -> translateGroup(scimContext, group))

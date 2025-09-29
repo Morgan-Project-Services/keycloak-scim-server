@@ -198,10 +198,9 @@ public class OrganizationScimServer extends AbstractScimServer<OrganizationScimC
             .build();
     }
 
-    @Override
     @ExcludeFromJacocoGeneratedReport
-    public Response listGroups(OrganizationScimContext scimContext, int startIndex, int count) {
-        fi.metatavu.keycloak.scim.server.model.GroupsList groupList = organizationGroupsController.listOrganizationGroups(scimContext, startIndex, count);
+    public Response listGroups(OrganizationScimContext scimContext, ScimFilter scimFilter, int startIndex, int count) {
+        fi.metatavu.keycloak.scim.server.model.GroupsList groupList = organizationGroupsController.listOrganizationGroups(scimContext, scimFilter, startIndex, count);
         return Response.ok(groupList).build();
     }
 

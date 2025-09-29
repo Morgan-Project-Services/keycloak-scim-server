@@ -94,7 +94,7 @@ public interface ScimServer <T extends ScimContext> {
      * @param count       count
      * @return response
      */
-    Response listGroups(T scimContext, int startIndex, int count);
+    Response listGroups(T scimContext, ScimFilter scimFilter, int startIndex, int count);
 
     /**
      * Finds a group by ID

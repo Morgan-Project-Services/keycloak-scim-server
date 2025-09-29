@@ -490,13 +490,24 @@ public class ScimResources {
             @PathParam("organizationId") String organizationId,
             @QueryParam("startIndex") @DefaultValue("0") int startIndex,
             @QueryParam("count") @DefaultValue("100") int count,
+            @QueryParam("filter") String filter,
             @Context UriInfo uriInfo
     ) {
+
+        ScimFilter scimFilter;
+        try {
+            scimFilter = parseFilter(filter);
+        } catch (Exception e) {
+            logger.warn(String.format("Failed to parse filter: '%s'", filter), e);
+            return Response.status(Response.Status.BAD_REQUEST).entity("Invalid filter").build();
+        }
+
         OrganizationScimContext scimContext = organizationScimServer.getScimContext(session, organizationId);
         organizationScimServer.verifyPermissions(scimContext);
 
         return organizationScimServer.listGroups(
             scimContext,
+            scimFilter,
             startIndex,
             count
         );
