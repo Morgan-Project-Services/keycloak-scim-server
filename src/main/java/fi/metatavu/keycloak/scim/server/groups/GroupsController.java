@@ -164,6 +164,7 @@ public class GroupsController extends AbstractController {
             switch (op) {
                 case REPLACE, ADD -> {
                     switch (groupAttribute) {
+                        case EXTERNAL_ID -> existing.setSingleAttribute("externalId", (String) value);
                         case DISPLAY_NAME -> existing.setName((String) value);
                         case MEMBERS -> {
                             // Clear current members if REPLACE, just add if ADD
@@ -195,6 +196,7 @@ public class GroupsController extends AbstractController {
 
                 case REMOVE -> {
                     switch (groupAttribute) {
+                        case EXTERNAL_ID -> existing.removeAttribute("externalId");
                         case DISPLAY_NAME -> existing.setName(null);
                         case MEMBERS -> {
                             for (Object obj : (List<?>) value) {

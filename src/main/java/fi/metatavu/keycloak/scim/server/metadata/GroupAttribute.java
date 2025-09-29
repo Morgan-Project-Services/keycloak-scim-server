@@ -6,7 +6,8 @@ package fi.metatavu.keycloak.scim.server.metadata;
 public enum GroupAttribute {
 
     DISPLAY_NAME ("displayName"),
-    MEMBERS ("members");
+    MEMBERS ("members"),
+    EXTERNAL_ID ("externalId");
 
     private final String scimPath;
 
