@@ -28,6 +28,7 @@ public class OrganizationGroupsController extends GroupsController {
 
         GroupModel parentGroup = session.groups().getGroupsStream(realm)
             .filter(g -> g.getFirstAttribute("organization").equals(scimContext.getOrganization().getAlias()))
+            .filter(g -> !"true".equals(g.getFirstAttribute("SCIM_SKIP")))
             .findFirst()
             .orElse(null);
 
